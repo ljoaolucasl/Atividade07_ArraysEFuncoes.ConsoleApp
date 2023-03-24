@@ -4,27 +4,20 @@ namespace Atividade07.ConsoleApp
 {
     internal class Program
     {
+        static int[] numerosInteiros = { -5, 3, 4, 5, 9, 6, 10, -2, 11, 1, 2, 6, 7, 8, 0, -6 };
+
         static void Main(string[] args)
         {
-            int[] numerosInteiros = { -5, 3, 4, 5, 9, 6, 10, -2, 11, 1, 2, 6, 7, 8, 0, -6 };
             bool opcaoInvalidaContinua = false;
             bool continua = true;
 
-            int numeroMaior, numeroMenor;
-            double valorMedioNumeros = 0;
-            int[] numerosNegativos;
-            int[] numerosOrdenados = new int[16];
-
-            Array.Copy(numerosInteiros, numerosOrdenados, 16);
-            Array.Sort(numerosOrdenados);
-
             while (continua)
             {
-                GerarSequenciaNumeros(numerosInteiros);
+                GerarSequenciaNumeros();
 
                 MenuOpcoes();
 
-                numerosInteiros = ExecutarOpcaoEscolhida(numerosInteiros, numerosOrdenados, ref opcaoInvalidaContinua, ref continua);
+                ExecutarOpcaoEscolhida(ref opcaoInvalidaContinua, ref continua);
 
                 if (opcaoInvalidaContinua)
                     continue;
@@ -33,24 +26,14 @@ namespace Atividade07.ConsoleApp
             }
         }
 
-        private static int[] ExecutarOpcaoEscolhida(int[] numerosInteiros, int[] numerosOrdenados, ref bool opcaoInvalidaContinua, ref bool continua)
+        private static void GerarSequenciaNumeros()
         {
-            Console.Write("\nDigite o número da opção escolhida: ");
-            int opcaoEscolhida = ValidarNumero();
-            opcaoInvalidaContinua = false;
+            Console.Clear();
+            Console.Write("Os números são: ");
 
-            switch (opcaoEscolhida)
-            {
-                case 1: GerarNumeroMaior(numerosInteiros); break;
-                case 2: GerarNumeroMenor(numerosInteiros); break;
-                case 3: GerarValorMedio(numerosInteiros); break;
-                case 4: GerarTresNumerosMaiores(numerosOrdenados); break;
-                case 5: GerarNumerosNegativos(numerosInteiros); break;
-                case 6: numerosInteiros = RemoverUltimoNumeroSequencia(numerosInteiros); break;
-                case 7: continua = false; Console.WriteLine("\nFinalizando aplicação..."); break;
-                default: opcaoInvalidaContinua = true; break;
-            }
-            return numerosInteiros;
+            Console.WriteLine(string.Join(", ", numerosInteiros));
+
+            Console.WriteLine($"\nOs {numerosInteiros.Length} números foram gerados!");
         }
 
         private static void MenuOpcoes()
@@ -61,8 +44,89 @@ namespace Atividade07.ConsoleApp
             Console.WriteLine("(3)Gerar valor médio");
             Console.WriteLine("(4)Gerar os três números maiores");
             Console.WriteLine("(5)Gerar os números negativos");
-            Console.WriteLine("(6)Remover o último número da sequência");
+            Console.WriteLine("(6)Remover um número da sequência");
             Console.WriteLine("(7)Sair do programa");
+        }
+
+        private static void GerarNumeroMaior()
+        {
+            int numeroMaior = numerosInteiros.Max();
+            Console.WriteLine($"\nO número maior é: {numeroMaior}");
+        }
+
+        private static void GerarNumeroMenor()
+        {
+            int numeroMenor = numerosInteiros.Min();
+            Console.WriteLine($"\nO número menor é: {numeroMenor}");
+        }
+
+        private static void GerarValorMedio()
+        {
+            double valorMedioNumeros = Math.Round(numerosInteiros.Average(), 2);
+            Console.WriteLine($"\nO valor médio é: {valorMedioNumeros}");
+        }
+
+        private static void GerarTresNumerosMaiores()
+        {
+            int[] numerosOrdenados = new int[numerosInteiros.Length];
+
+            Array.Copy(numerosInteiros, numerosOrdenados, numerosInteiros.Length);
+            Array.Sort(numerosOrdenados);
+
+            Console.Write("\nOs três números maiores são: ");
+            Console.WriteLine(string.Join(", ", numerosOrdenados.Skip(numerosInteiros.Length - 3)));
+        }
+
+        private static void GerarNumerosNegativos()
+        {
+            int[] numerosNegativos = Array.FindAll(numerosInteiros, numero => numero < 0);
+            Console.Write($"\nos negativos são: ");
+            Console.WriteLine(string.Join(", ", numerosNegativos));
+        }
+
+        private static void RemoverNumeroEscolhidoSequencia()
+        {
+            int posicaoArray, numeroRemover = 0;
+
+            do
+            {
+                Console.Write("\nQual a posição do número que deseja remover? ");
+                numeroRemover = ValidarNumero();
+
+                posicaoArray = Array.FindIndex(numerosInteiros, numero => numero == numeroRemover);
+
+                if (posicaoArray == -1)
+                    Console.WriteLine("\nNão existe esse número na sequência");
+
+            } while (posicaoArray == -1);
+
+            Console.WriteLine("Removendo...");
+
+            for (int i = posicaoArray; i < numerosInteiros.Length - 1; i++)
+            {
+                numerosInteiros[i] = numerosInteiros[i + 1];
+            }
+
+            Array.Resize(ref numerosInteiros, numerosInteiros.Length - 1);
+        }
+
+        private static void ExecutarOpcaoEscolhida(ref bool opcaoInvalidaContinua, ref bool continua)
+        {
+            Console.Write("\nDigite o número da opção escolhida: ");
+            int opcaoEscolhida = ValidarNumero();
+            opcaoInvalidaContinua = false;
+
+            switch (opcaoEscolhida)
+            {
+                case 1: GerarNumeroMaior(); break;
+                case 2: GerarNumeroMenor(); break;
+                case 3: GerarValorMedio(); break;
+                case 4: GerarTresNumerosMaiores(); break;
+                case 5: GerarNumerosNegativos(); break;
+                case 6: RemoverNumeroEscolhidoSequencia(); break;
+                case 7: continua = false; Console.WriteLine("\nFinalizando aplicação..."); break;
+                default: opcaoInvalidaContinua = true; break;
+            }
         }
 
         private static int ValidarNumero()
@@ -76,76 +140,6 @@ namespace Atividade07.ConsoleApp
 
             if (!validarNumero) { return 0; }
             else { return numero; }
-        }
-
-        private static int[] RemoverUltimoNumeroSequencia(int[] numerosInteiros)
-        {
-
-            int posicaoArray;
-            int numeroRemover = 0;
-
-            do
-            {
-                Console.Write("\nQual a posição do número que deseja remover? ");
-                numeroRemover = ValidarNumero();
-
-                posicaoArray = Array.FindIndex(numerosInteiros, numero => numero == numeroRemover);
-
-                if (posicaoArray == -1)
-                {
-                    Console.WriteLine("\nNão existe esse número na sequência");
-                }
-
-            } while (posicaoArray == -1);
-
-            Console.WriteLine("Removendo...");
-
-            numerosInteiros[posicaoArray] = 100;
-
-            return numerosInteiros;
-        }
-
-        private static void GerarNumerosNegativos(int[] numerosInteiros)
-        {
-            int[] numerosNegativos = Array.FindAll(numerosInteiros, numero => numero < 0);
-            Console.Write($"\nos negativos são: ");
-            Console.WriteLine(string.Join(", ", numerosNegativos));
-        }
-
-        private static void GerarTresNumerosMaiores(int[] numerosOrdenados)
-        {
-            Console.Write("\nOs três números maiores são: ");
-            Console.WriteLine(string.Join(", ", numerosOrdenados.Skip(13)));
-        }
-
-        private static void GerarValorMedio(int[] numerosInteiros)
-        {
-            double valorMedioNumeros = numerosInteiros.Average();
-            Console.WriteLine($"\nO valor médio é: {valorMedioNumeros}");
-        }
-
-        private static void GerarNumeroMenor(int[] numerosInteiros)
-        {
-            int numeroMenor = numerosInteiros.Min();
-            Console.WriteLine($"\nO número menor é: {numeroMenor}");
-        }
-
-        private static void GerarNumeroMaior(int[] numerosInteiros)
-        {
-            int numeroMaior = numerosInteiros.Max();
-            Console.WriteLine($"\nO número maior é: {numeroMaior}");
-        }
-
-        private static void GerarSequenciaNumeros(int[] numerosInteiros)
-        {
-            Console.Clear();
-            Console.Write("Os números são: ");
-
-            foreach (int numero in numerosInteiros)
-            {
-                if (numero != 100) { Console.Write($" {numero}"); }
-            }
-            Console.WriteLine($"\nOs {numerosInteiros.Length - 1} números foram gerados!");
         }
     }
 }
