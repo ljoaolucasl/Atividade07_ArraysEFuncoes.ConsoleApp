@@ -4,10 +4,12 @@ namespace Atividade07.ConsoleApp
 {
     internal class Program
     {
-        static int[] numerosInteiros = { -5, 3, 4, 5, 9, 6, 10, -2, 11, 1, 2, 6, 7, 8, 0, -6 };
+        static int[] numerosInteiros = new int[10];
 
         static void Main(string[] args)
         {
+            ObterNumerosSequencia();
+
             bool opcaoInvalidaContinua = false;
             bool continua = true;
 
@@ -23,6 +25,17 @@ namespace Atividade07.ConsoleApp
                     continue;
 
                 Console.ReadLine();
+            }
+        }
+
+        private static void ObterNumerosSequencia()
+        {
+            for (int i = 0; i < numerosInteiros.Length; i++)
+            {
+                Console.Write($"Digite o {i + 1}° da sequência: ");
+                int numeroInserido = ValidarNumero();
+
+                numerosInteiros[i] = numeroInserido;
             }
         }
 
@@ -90,7 +103,7 @@ namespace Atividade07.ConsoleApp
 
             do
             {
-                Console.Write("\nQual a posição do número que deseja remover? ");
+                Console.Write("\nQual o número que deseja remover? ");
                 numeroRemover = ValidarNumero();
 
                 posicaoArray = Array.FindIndex(numerosInteiros, numero => numero == numeroRemover);
@@ -134,12 +147,14 @@ namespace Atividade07.ConsoleApp
             bool validarNumero;
             int numero;
 
-            string entrada = Console.ReadLine();
+            do {
+                string entrada = Console.ReadLine();
 
-            validarNumero = int.TryParse(entrada, out numero);
+                validarNumero = int.TryParse(entrada, out numero);
 
-            if (!validarNumero) { return 0; }
-            else { return numero; }
+            } while (!validarNumero);
+
+            return numero;
         }
     }
 }
